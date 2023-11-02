@@ -1,13 +1,31 @@
-import { applyMiddleware, combineReducers, createStore } from "redux";
-import thunk from "redux-thunk";
-import accountReducer from "./features/account/accountSlice";
-import customerReducer from "./features/customers/customerSlice";
+const initialState = {
+  balance: 0,
+  loan: 0,
+  loanPurpose: "",
+};
 
-const rootReducer = combineReducers({
-  account: accountReducer,
-  customer: customerReducer,
-});
+function reducer(state = initialState, action) {
+  switch (action.type) {
+    case "account/deposit":
+      return { ...state, balance: state.balance + action.payload };
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
+    case "account/withdraw":
+      return { ...state, balance: state.balance - action.payload };
 
-export default store;
+    case "account/requestLoan":
+      if (state.loan > 0) return state;
+      //   LATER
+      return { ...state, loan: action.payload };
+
+    case "account/payloan":
+      return {
+        ...state,
+        loan: 0,
+        loanPurpose: "",
+        balance: state.balance - state.loan,
+      };
+
+    default:
+      return state;
+  }
+}
